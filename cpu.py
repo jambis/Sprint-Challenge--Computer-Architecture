@@ -30,7 +30,6 @@ class CPU:
         self.branchtable[86] = self.JNE
         self.branchtable[85] = self.JEQ
 
-
     def load(self, file_path):
         """Load a program into memory."""
 
@@ -65,7 +64,8 @@ class CPU:
         elif op == "OR":
             self.reg[reg_a] |= self.reg[reg_b]
         elif op == "NOT":
-            self.reg[reg_a] ~= self.reg[reg_b]
+            result = ~self.reg[reg_a] 
+            self.reg[reg_a] = result
         elif op == "SHL":
             self.reg[reg_a] <<= self.reg[reg_b]
         elif op == "SHR":
@@ -137,7 +137,6 @@ class CPU:
         self.push(self.pc + 2)
         self.pc = new_pc
         
-
     def mul2(self):
         self.alu("ADD", self.ram_read(self.pc+1), self.ram_read(self.pc+2))
         self.pc += 3
@@ -146,8 +145,6 @@ class CPU:
         self.pc = self.ram_read(self.reg[self.sp])
         self.reg[self.sp] += 1
 
-    
-    
     def store(self):
         value = self.reg[self.ram_read(self.pc + 1)]
         store_index = self.ram_read(self.pc + 2)
