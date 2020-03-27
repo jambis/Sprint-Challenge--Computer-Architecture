@@ -27,6 +27,8 @@ class CPU:
         self.branchtable[132] = self.store
         self.branchtable[167] = self.compare
         self.branchtable[84] = self.jump
+        self.branchtable[86] = self.JNE
+        self.branchtable[85] = self.JEQ
 
 
     def load(self, file_path):
@@ -39,6 +41,7 @@ class CPU:
             if line[:8][0] == "0" or line[:8][0] == "1":
                 self.ram[address] = int(line[:8],2)
                 address += 1
+        # print(self.ram)
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
@@ -48,8 +51,8 @@ class CPU:
         #elif op == "SUB": etc
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
-        elif op = "CMP":
-            if self.reg[reg_a] = self.reg[reg_b]:
+        elif op == "CMP":
+            if self.reg[reg_a] == self.reg[reg_b]:
                 self.flag = 1
             elif self.reg[reg_a] > self.reg[reg_b]:
                 self.flag = 2
@@ -125,9 +128,7 @@ class CPU:
         self.pc = self.ram_read(self.reg[self.sp])
         self.reg[self.sp] += 1
 
-    def run(self):
-        """Run the CPU."""
-        running = True
+    
     
     def store(self):
         value = self.reg[self.ram_read(self.pc + 1)]
@@ -143,7 +144,23 @@ class CPU:
         reg_index = self.ram_read(self.pc + 1)
         value = self.reg[reg_index]
         self.pc = value
+
+    def JNE(self):
+        if ~self.flag  & 1:
+            self.jump()
+        else:
+            self.pc += 2
+
+    def JEQ(self):
+        if self.flag & 1:
+            self.jump()
+        else:
+            self.pc += 2
         
+    def run(self):
+        """Run the CPU."""
+        running = True
+
         while running:
             IR = self.ram_read(self.pc)
             # print(IR) 
