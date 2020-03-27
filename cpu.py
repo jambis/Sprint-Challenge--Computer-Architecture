@@ -58,6 +58,24 @@ class CPU:
                 self.flag = 2
             elif self.reg[reg_a] < self.reg[reg_b]:
                 self.flag = 4
+        elif op == "XOR":
+            self.reg[reg_a] ^= self.reg[reg_b]
+        elif op == "AND":
+            self.reg[reg_a] &= self.reg[reg_b]
+        elif op == "OR":
+            self.reg[reg_a] |= self.reg[reg_b]
+        elif op == "NOT":
+            self.reg[reg_a] ~= self.reg[reg_b]
+        elif op == "SHL":
+            self.reg[reg_a] <<= self.reg[reg_b]
+        elif op == "SHR":
+            self.reg[reg_a] >>= self.reg[reg_b]
+        elif op == "MOD":
+            if self.reg[reg_b] is not 0:
+                self.reg[reg_a] %= self.reg[reg_b]
+            else:
+                print("Cannot preform modulus with second argument being 0")
+                sys.exit(1)
         else:
             raise Exception("Unsupported ALU operation")
 
