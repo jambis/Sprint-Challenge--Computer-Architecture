@@ -13,6 +13,7 @@ class CPU:
         self.pc = 0             # Program counter
         self.sp = 7             # Stack pointer index in the register
         self.reg[self.sp] = 244 # Stack pointer 
+        self.flag = 0           # Flag 00000LGE
 
         self.branchtable = {}   #Branch table
         self.branchtable[130] = self.LDI
@@ -24,6 +25,8 @@ class CPU:
         self.branchtable[17] = self.ret
         self.branchtable[80] = self.call
         self.branchtable[132] = self.store
+        self.branchtable[167] = self.compare
+        self.branchtable[84] = self.jump
 
 
     def load(self, file_path):
@@ -45,6 +48,13 @@ class CPU:
         #elif op == "SUB": etc
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
+        elif op = "CMP":
+            if self.reg[reg_a] = self.reg[reg_b]:
+                self.flag = 1
+            elif self.reg[reg_a] > self.reg[reg_b]:
+                self.flag = 2
+            elif self.reg[reg_a] < self.reg[reg_b]:
+                self.flag = 4
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -124,6 +134,15 @@ class CPU:
         store_index = self.ram_read(self.pc + 2)
         self.reg[store_index] = value
         self.pc += 3
+    
+    def compare(self):
+        self.alu('CMP', self.ram_read(self.pc+1), self.ram_read(self.pc+2))
+        self.pc += 3
+
+    def jump(self):
+        reg_index = self.ram_read(self.pc + 1)
+        value = self.reg[reg_index]
+        self.pc = value
         
         while running:
             IR = self.ram_read(self.pc)
