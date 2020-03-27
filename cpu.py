@@ -29,6 +29,14 @@ class CPU:
         self.branchtable[84] = self.jump
         self.branchtable[86] = self.JNE
         self.branchtable[85] = self.JEQ
+        self.branchtable[170] = self.OR_
+        self.branchtable[171] = self.XOR_
+        self.branchtable[105] = self.NOT_
+        self.branchtable[172] = self.SHL
+        self.branchtable[173] = self.SHR
+        self.branchtable[164] = self.MOD_
+        self.branchtable[168] = self.AND_
+
 
     def load(self, file_path):
         """Load a program into memory."""
@@ -50,6 +58,7 @@ class CPU:
         #elif op == "SUB": etc
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
+
         elif op == "CMP":
             if self.reg[reg_a] == self.reg[reg_b]:
                 self.flag = 1
@@ -57,25 +66,33 @@ class CPU:
                 self.flag = 2
             elif self.reg[reg_a] < self.reg[reg_b]:
                 self.flag = 4
+
         elif op == "XOR":
             self.reg[reg_a] ^= self.reg[reg_b]
+
         elif op == "AND":
             self.reg[reg_a] &= self.reg[reg_b]
+
         elif op == "OR":
             self.reg[reg_a] |= self.reg[reg_b]
+
         elif op == "NOT":
-            result = ~self.reg[reg_a] 
+            result = 0b11111111 - self.reg[reg_a]
             self.reg[reg_a] = result
+
         elif op == "SHL":
             self.reg[reg_a] <<= self.reg[reg_b]
+
         elif op == "SHR":
             self.reg[reg_a] >>= self.reg[reg_b]
+
         elif op == "MOD":
             if self.reg[reg_b] is not 0:
                 self.reg[reg_a] %= self.reg[reg_b]
             else:
                 print("Cannot preform modulus with second argument being 0")
                 sys.exit(1)
+
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -171,6 +188,34 @@ class CPU:
             self.jump()
         else:
             self.pc += 2
+
+    def XOR_(self):
+        self.alu('XOR', self.ram_read(self.pc+1), self.ram_read(self.pc+2))
+        self.pc += 3
+
+    def OR_(self):
+        self.alu('OR', self.ram_read(self.pc+1), self.ram_read(self.pc+2))
+        self.pc += 3
+
+    def NOT_(self):
+        self.alu('NOT', self.ram_read(self.pc+1), None)
+        self.pc += 2
+
+    def SHR(self):
+        self.alu("SHR", self.ram_read(self.pc+1), self.ram_read(self.pc+2))
+        self.pc += 3
+
+    def SHL(self):
+        self.alu("SHL", self.ram_read(self.pc+1), self.ram_read(self.pc+2))
+        self.pc += 3
+
+    def MOD_(self):
+        self.alu("MOD", self.ram_read(self.pc+1), self.ram_read(self.pc+2))
+        self.pc += 3
+
+    def AND_(self):
+        self.alu("AND", self.ram_read(self.pc+1), self.ram_read(self.pc+2))
+        self.pc += 3
         
     def run(self):
         """Run the CPU."""
